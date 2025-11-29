@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quản lý người dùng - Admin Dashboard">
+    <title>Admin Dashboard - AI Smart To-Do List</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand">
+                <h2>🤖 AI Smart To-Do List</h2>
+            </div>
+            <div class="nav-menu">
+                <span class="nav-user">👤 <span id="navUserName">Admin</span></span>
+                <a href="index.html" class="btn btn-secondary btn-sm">📋 Tasks</a>
+                <a href="profile.html" class="btn btn-secondary btn-sm">👤 Profile</a>
+                <button id="logoutBtn" class="btn btn-secondary btn-sm">🚪 Đăng xuất</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Admin Header -->
+        <header class="header">
+            <h1>⚙️ Admin Dashboard</h1>
+            <p>Quản lý người dùng và theo dõi hoạt động hệ thống</p>
+        </header>
+
+        <!-- Statistics Overview -->
+        <section class="admin-stats-section">
+            <div class="glass-card">
+                <h2>📊 Thống Kê Tổng Quan</h2>
+                <div class="analysis-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalUsers">0</div>
+                        <div class="stat-label">Tổng Người Dùng</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalSystemTasks">0</div>
+                        <div class="stat-label">Tổng Công Việc</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalCompletedTasks">0</div>
+                        <div class="stat-label">Đã Hoàn Thành</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-value" id="systemCompletionRate">0%</div>
+                        <div class="stat-label">Tỷ Lệ Hoàn Thành</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Users Management -->
+        <section class="users-section">
+            <div class="glass-card">
+                <h2>👥 Quản Lý Người Dùng</h2>
+                <div id="usersContainer" class="users-container">
+                    <!-- Users will be loaded here -->
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script type="module">
+        import authService from './firebase-auth.js';
+
+        // Wait for auth and check admin
+        (async () => {
+            await authService.waitForAuth();
+
+            if (!authService.isLoggedIn()) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            if (!authService.isAdmin()) {
+                alert('Bạn không có quyền truy cập trang này!');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Display user name in nav
+            const currentUser = authService.getCurrentUser();
+            document.getElementById('navUserName').textContent = currentUser.fullName;
+
+            // Logout functionality
+            document.getElementById('logoutBtn').addEventListener('click', async () => {
+                await authService.logout();
+                window.location.href = 'login.html';
+            });
+
+            // Load users
+            await loadUsers();
+        })();
+
+        // Load and display all users
+        async function loadUsers() {
+            const usersWithStats = await authService.getAllUsersWithStats();
+            const usersContainer = document.getElementById('usersContainer');
+
+            if (usersWithStats.length === 0) {
+                usersContainer.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">👤</div>
+            <p>Chưa có người dùng nào trong hệ thống</p>
+          </div>
+        `;
+                return;
+            }
+
+            usersContainer.innerHTML = usersWithStats.map(user => `
+        <div class="user-card">
+          <div class="user-header">
+            <div class="user-icon">${user.role === 'admin' ? '👑' : '👤'}</div>
+            <div class="user-info">
+              <h3>${escapeHtml(user.fullName)}</h3>
+              <p class="user-username">@${escapeHtml(user.username)}</p>
+              <div class="user-meta">
+                <span class="badge ${user.role === 'admin' ? 'badge-priority critical' : 'badge-category'}">
+                  ${user.role === 'admin' ? '👑 ADMIN' : '👤 USER'}
+                </span>
+                <span class="badge badge-time">
+                  📅 ${formatDate(user.createdAt)}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="user-stats">
+            <div class="user-stat">
+              <div class="stat-label">Công việc</div>
+              <div class="stat-value-sm">${user.stats.totalTasks}</div>
+            </div>
+            <div class="user-stat">
+              <div class="stat-label">Hoàn thành</div>
+              <div class="stat-value-sm">${user.stats.completedTasks}</div>
+            </div>
+            <div class="user-stat">
+              <div class="stat-label">Tỷ lệ</div>
+              <div class="stat-value-sm">${user.stats.completionRate}%</div>
+            </div>
+          </div>
+
+          <div class="user-actions">
+            ${user.username !== 'admin' ? `
+              <button class="btn btn-secondary btn-sm" onclick="deleteUser('${escapeHtml(user.username)}')">
+                🗑️ Xóa người dùng
+              </button>
+            ` : '<span class="text-muted">Không thể xóa admin</span>'}
+          </div>
+        </div>
+      `).join('');
+
+            // Update overview statistics
+            updateOverviewStats(usersWithStats);
+        }
+
+        // Update overview statistics
+        function updateOverviewStats(usersWithStats) {
+            const totalUsers = usersWithStats.length;
+            let totalTasks = 0;
+            let totalCompleted = 0;
+
+            usersWithStats.forEach(user => {
+                totalTasks += user.stats.totalTasks;
+                totalCompleted += user.stats.completedTasks;
+            });
+
+            const completionRate = totalTasks > 0 ? Math.round((totalCompleted / totalTasks) * 100) : 0;
+
+            document.getElementById('totalUsers').textContent = totalUsers;
+            document.getElementById('totalSystemTasks').textContent = totalTasks;
+            document.getElementById('totalCompletedTasks').textContent = totalCompleted;
+            document.getElementById('systemCompletionRate').textContent = completionRate + '%';
+        }
+
+        // Delete user
+        window.deleteUser = async function (username) {
+            if (confirm(`Bạn có chắc muốn xóa người dùng "${username}"?\nDữ liệu của người dùng này sẽ bị xóa vĩnh viễn!`)) {
+                const result = await authService.deleteUser(username);
+
+                if (result.success) {
+                    alert(result.message);
+                    await loadUsers(); // Reload users list
+                } else {
+                    alert(result.message);
+                }
+            }
+        }
+
+        // Helper: Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Helper: Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+    </script>
+</body>
+
+</html>

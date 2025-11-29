@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="AI Smart To-Do List - Ứng dụng quản lý công việc thông minh với AI phân tích mức độ ưu tiên và gợi ý thời gian làm việc hiệu quả">
+    <meta name="keywords" content="to-do list, task management, AI, productivity, quản lý công việc">
+    <title>AI Smart To-Do List - Quản Lý Công Việc Thông Minh</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand">
+                <h2>🤖 AI Smart To-Do List</h2>
+            </div>
+            <div class="nav-menu">
+                <span class="nav-user">👤 <span id="navUserName">User</span></span>
+                <a href="admin.html" id="adminLink" class="btn btn-secondary btn-sm hidden">⚙️ Admin</a>
+                <button id="logoutBtn" class="btn btn-secondary btn-sm">🚪 Đăng xuất</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>🤖 AI Smart To-Do List</h1>
+            <p>Quản lý công việc thông minh với AI phân tích và tối ưu hiệu suất</p>
+        </header>
+
+        <!-- Task Input Section -->
+        <section class="task-input-section">
+            <div class="glass-card">
+                <h2>📝 Thêm Công Việc Mới</h2>
+                <form id="taskForm" class="input-group">
+                    <div class="input-wrapper">
+                        <textarea id="taskTitle" class="task-textarea"
+                            placeholder="Nhập công việc cần làm... (VD: Hoàn thành báo cáo quan trọng cho sếp)"
+                            required></textarea>
+                    </div>
+
+                    <div class="input-row">
+                        <div class="input-wrapper">
+                            <select id="taskDeadline" class="task-select">
+                                <option value="">⏰ Thời hạn (Tùy chọn)</option>
+                                <option value="today">Hôm nay</option>
+                                <option value="tomorrow">Ngày mai</option>
+                                <option value="this-week">Tuần này</option>
+                                <option value="next-week">Tuần sau</option>
+                                <option value="no-deadline">Không có deadline</option>
+                            </select>
+                        </div>
+
+                        <div class="input-wrapper">
+                            <select id="taskManualPriority" class="task-select">
+                                <option value="">⭐ Mức độ quan trọng (Tùy chọn)</option>
+                                <option value="critical">Cực kỳ quan trọng</option>
+                                <option value="high">Quan trọng</option>
+                                <option value="medium">Trung bình</option>
+                                <option value="low">Không gấp</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        ✨ Thêm & Phân Tích
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Task List Section -->
+        <section class="task-list-section">
+            <div class="glass-card">
+                <h2>📋 Danh Sách Công Việc</h2>
+                <div id="tasksContainer" class="tasks-container">
+                    <!-- Tasks will be inserted here dynamically -->
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <p>Chưa có công việc nào. Hãy thêm công việc đầu tiên!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analysis Section -->
+        <section class="analysis-section">
+            <div class="glass-card">
+                <h2>📊 Phân Tích Hiệu Suất</h2>
+
+                <div class="analysis-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalTasks">0</div>
+                        <div class="stat-label">Tổng Công Việc</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-value" id="completedTasks">0</div>
+                        <div class="stat-label">Đã Hoàn Thành</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-value" id="completionRate">0%</div>
+                        <div class="stat-label">Tỷ Lệ Hoàn Thành</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-value" id="estimatedTime">0h</div>
+                        <div class="stat-label">Thời Gian Còn Lại</div>
+                    </div>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+
+                <div class="analysis-content mt-3" id="analysisContent">
+                    <h3>💡 Đề Xuất & Phân Tích</h3>
+                    <ul id="analysisList">
+                        <li>Bắt đầu thêm công việc để nhận được phân tích từ AI</li>
+                        <!DOCTYPE html>
+                        <html lang="vi">
+
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <meta name="description"
+                                content="AI Smart To-Do List - Ứng dụng quản lý công việc thông minh với AI phân tích mức độ ưu tiên và gợi ý thời gian làm việc hiệu quả">
+                            <meta name="keywords"
+                                content="to-do list, task management, AI, productivity, quản lý công việc">
+                            <title>AI Smart To-Do List - Quản Lý Công Việc Thông Minh</title>
+                            <link rel="stylesheet" href="style.css">
+                        </head>
+
+                        <body>
+                            <!-- Navigation Bar -->
+                            <nav class="navbar">
+                                <div class="nav-content">
+                                    <div class="nav-brand">
+                                        <h2>🤖 AI Smart To-Do List</h2>
+                                    </div>
+                                    <div class="nav-menu">
+                                        <span class="nav-user">👤 <span id="navUserName">User</span></span>
+                                        <a href="admin.html" id="adminLink" class="btn btn-secondary btn-sm hidden">⚙️
+                                            Admin</a>
+                                        <button id="logoutBtn" class="btn btn-secondary btn-sm">🚪 Đăng xuất</button>
+                                    </div>
+                                </div>
+                            </nav>
+
+                            <div class="container">
+                                <!-- Header -->
+                                <header class="header">
+                                    <h1>🤖 AI Smart To-Do List</h1>
+                                    <p>Quản lý công việc thông minh với AI phân tích và tối ưu hiệu suất</p>
+                                </header>
+
+                                <!-- Task Input Section -->
+                                <section class="task-input-section">
+                                    <div class="glass-card">
+                                        <h2>📝 Thêm Công Việc Mới</h2>
+                                        <form id="taskForm" class="input-group">
+                                            <div class="input-wrapper">
+                                                <textarea id="taskTitle" class="task-textarea"
+                                                    placeholder="Nhập công việc cần làm... (VD: Hoàn thành báo cáo quan trọng cho sếp)"
+                                                    required></textarea>
+                                            </div>
+
+                                            <div class="input-row">
+                                                <div class="input-wrapper">
+                                                    <select id="taskDeadline" class="task-select">
+                                                        <option value="">⏰ Thời hạn (Tùy chọn)</option>
+                                                        <option value="today">Hôm nay</option>
+                                                        <option value="tomorrow">Ngày mai</option>
+                                                        <option value="this-week">Tuần này</option>
+                                                        <option value="next-week">Tuần sau</option>
+                                                        <option value="no-deadline">Không có deadline</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="input-wrapper">
+                                                    <select id="taskManualPriority" class="task-select">
+                                                        <option value="">⭐ Mức độ quan trọng (Tùy chọn)</option>
+                                                        <option value="critical">Cực kỳ quan trọng</option>
+                                                        <option value="high">Quan trọng</option>
+                                                        <option value="medium">Trung bình</option>
+                                                        <option value="low">Không gấp</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <button type="submit" class="btn btn-primary">
+                                                ✨ Thêm & Phân Tích
+                                            </button>
+                                        </form>
+                                    </div>
+                                </section>
+
+                                <!-- Task List Section -->
+                                <section class="task-list-section">
+                                    <div class="glass-card">
+                                        <h2>📋 Danh Sách Công Việc</h2>
+                                        <div id="tasksContainer" class="tasks-container">
+                                            <!-- Tasks will be inserted here dynamically -->
+                                            <div class="empty-state">
+                                                <div class="empty-state-icon">📭</div>
+                                                <p>Chưa có công việc nào. Hãy thêm công việc đầu tiên!</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <!-- Analysis Section -->
+                                <section class="analysis-section">
+                                    <div class="glass-card">
+                                        <h2>📊 Phân Tích Hiệu Suất</h2>
+
+                                        <div class="analysis-grid">
+                                            <div class="stat-card">
+                                                <div class="stat-value" id="totalTasks">0</div>
+                                                <div class="stat-label">Tổng Công Việc</div>
+                                            </div>
+
+                                            <div class="stat-card">
+                                                <div class="stat-value" id="completedTasks">0</div>
+                                                <div class="stat-label">Đã Hoàn Thành</div>
+                                            </div>
+
+                                            <div class="stat-card">
+                                                <div class="stat-value" id="completionRate">0%</div>
+                                                <div class="stat-label">Tỷ Lệ Hoàn Thành</div>
+                                            </div>
+
+                                            <div class="stat-card">
+                                                <div class="stat-value" id="estimatedTime">0h</div>
+                                                <div class="stat-label">Thời Gian Còn Lại</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                                        </div>
+
+                                        <div class="analysis-content mt-3" id="analysisContent">
+                                            <h3>💡 Đề Xuất & Phân Tích</h3>
+                                            <ul id="analysisList">
+                                                <li>Bắt đầu thêm công việc để nhận được phân tích từ AI</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+
+                            <!-- Firebase Scripts (ES Modules) -->
+                            <script type="module" src="firebase-config.js"></script>
+                            <script type="module" src="firebase-auth.js"></script>
+                            <script type="module">
+                                import authService from './firebase-auth.js';
+
+                                // Wait for auth to be ready
+                                (async () => {
+                                    await authService.waitForAuth();
+
+                                    // Check authentication
+                                    if (!authService.isLoggedIn()) {
+                                        window.location.href = 'login.html';
+                                        return;
+                                    }
+
+                                    // Display user info
+                                    const currentUser = authService.getCurrentUser();
+                                    if (currentUser) {
+                                        document.getElementById('navUserName').textContent = currentUser.fullName;
+
+                                        // Show admin link if user is admin
+                                        if (authService.isAdmin()) {
+                                            document.getElementById('adminLink').classList.remove('hidden');
+                                        }
+                                    }
+
+                                    // Logout functionality
+                                    document.getElementById('logoutBtn').addEventListener('click', async () => {
+                                        await authService.logout();
+                                        window.location.href = 'login.html';
+                                    });
+                                })();
+                            </script>
+                            <script type="module" src="firebase-app.js"></script>
+                        </body>
+
+                        </html>

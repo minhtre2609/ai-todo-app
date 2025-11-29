@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Trang cá nhân - AI Smart To-Do List">
+    <title>Profile - AI Smart To-Do List</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand">
+                <h2>🤖 AI Smart To-Do List</h2>
+            </div>
+            <div class="nav-menu">
+                <span class="nav-user">👤 <span id="navUserName">User</span></span>
+                <a href="index.html" class="btn btn-secondary btn-sm">📋 Tasks</a>
+                <a href="admin.html" id="adminLink" class="btn btn-secondary btn-sm hidden">⚙️ Admin</a>
+                <button id="logoutBtn" class="btn btn-secondary btn-sm">🚪 Đăng xuất</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>👤 Thông Tin Cá Nhân</h1>
+            <p>Quản lý thông tin tài khoản và thống kê hoạt động</p>
+        </header>
+
+        <!-- Personal Information -->
+        <section class="profile-section">
+            <div class="glass-card">
+                <h2>📱 Thông Tin Cá Nhân</h2>
+                <div class="profile-info">
+                    <div class="profile-avatar">
+                        <div class="avatar-circle" id="avatarCircle">👤</div>
+                    </div>
+
+                    <div class="profile-details">
+                        <div class="profile-info-row">
+                            <span class="info-label">Họ và tên:</span>
+                            <span class="info-value" id="profileFullName">-</span>
+                        </div>
+
+                        <div class="profile-info-row">
+                            <span class="info-label">Tên đăng nhập:</span>
+                            <span class="info-value" id="profileUsername">-</span>
+                        </div>
+
+                        <div class="profile-info-row">
+                            <span class="info-label">Email:</span>
+                            <span class="info-value" id="profileEmail">-</span>
+                        </div>
+
+                        <div class="profile-info-row">
+                            <span class="info-label">Vai trò:</span>
+                            <span class="badge" id="profileRole">USER</span>
+                        </div>
+
+                        <div class="profile-info-row">
+                            <span class="info-label">Ngày tạo:</span>
+                            <span class="info-value" id="profileCreatedAt">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Activity Statistics -->
+        <section class="profile-section">
+            <div class="glass-card">
+                <h2>📊 Thống Kê Hoạt Động</h2>
+                <div class="analysis-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statTotalTasks">0</div>
+                        <div class="stat-label">Tổng Công Việc</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-value" id="statCompletedTasks">0</div>
+                        <div class="stat-label">Đã Hoàn Thành</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-value" id="statPendingTasks">0</div>
+                        <div class="stat-label">Đang Làm</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-value" id="statCompletionRate">0%</div>
+                        <div class="stat-label">Tỷ Lệ Hoàn Thành</div>
+                    </div>
+                    <label for="oldPassword">Mật khẩu hiện tại</label>
+                    <input type="password" id="oldPassword" class="task-input" placeholder="Nhập mật khẩu hiện tại"
+                        required>
+                </div>
+
+                <div class="input-wrapper">
+                    <label for="newPassword">Mật khẩu mới</label>
+                    <input type="password" id="newPassword" class="task-input"
+                        placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)" required minlength="6">
+                </div>
+
+                <div class="input-wrapper">
+                    <label for="confirmPassword">Xác nhận mật khẩu mới</label>
+                    <input type="password" id="confirmPassword" class="task-input" placeholder="Nhập lại mật khẩu mới"
+                        required>
+                </div>
+
+                <div id="passwordMessage" class="auth-message hidden"></div>
+
+                <button type="submit" class="btn btn-primary">
+                    🔒 Đổi Mật Khẩu
+                </button>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script type="module">
+        import authService from './firebase-auth.js';
+
+        // Wait for auth and check login
+        (async () => {
+            await authService.waitForAuth();
+
+            if (!authService.isLoggedIn()) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const currentUser = authService.getCurrentUser();
+            if (!currentUser) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Display user name in nav
+            document.getElementById('navUserName').textContent = currentUser.fullName;
+
+            // Show admin link if admin
+            if (authService.isAdmin()) {
+                document.getElementById('adminLink').classList.remove('hidden');
+            }
+
+            // Logout functionality
+            document.getElementById('logoutBtn').addEventListener('click', async () => {
+                await authService.logout();
+                window.location.href = 'login.html';
+            });
+
+            // Load profile data
+            await loadProfileData(currentUser);
+
+            // Change password form
+            document.getElementById('changePasswordForm').addEventListener('submit', handlePasswordChange);
+        })();
+
+        // Load profile data
+        async function loadProfileData(user) {
+            // Personal info
+            document.getElementById('profileFullName').textContent = user.fullName;
+            document.getElementById('profileUsername').textContent = '@' + user.username;
+            document.getElementById('profileEmail').textContent = user.email;
+
+            const roleBadge = document.getElementById('profileRole');
+            roleBadge.textContent = user.role === 'admin' ? '👑 ADMIN' : '👤 USER';
+            roleBadge.className = user.role === 'admin' ? 'badge badge-priority critical' : 'badge badge-category';
+
+            // Created date
+            const createdDate = user.createdAt ? new Date(user.createdAt) : new Date();
+            document.getElementById('profileCreatedAt').textContent = formatDate(createdDate);
+
+            // Avatar initial
+            const initial = user.fullName.charAt(0).toUpperCase();
+            document.getElementById('avatarCircle').textContent = initial;
+
+            // Load statistics
+            const stats = await authService.getUserStats();
+            document.getElementById('statTotalTasks').textContent = stats.totalTasks;
+            document.getElementById('statCompletedTasks').textContent = stats.completedTasks;
+            document.getElementById('statPendingTasks').textContent = stats.pendingTasks;
+            document.getElementById('statCompletionRate').textContent = stats.completionRate + '%';
+            document.getElementById('profileProgressFill').style.width = stats.completionRate + '%';
+        }
+
+        // Handle password change
+        async function handlePasswordChange(e) {
+            e.preventDefault();
+
+            const oldPassword = document.getElementById('oldPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Validate
+            if (newPassword !== confirmPassword) {
+                showPasswordMessage('Mật khẩu mới và xác nhận không khớp!', 'error');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                showPasswordMessage('Mật khẩu mới phải có ít nhất 6 ký tự!', 'error');
+                return;
+            }
+
+            if (newPassword === oldPassword) {
+                showPasswordMessage('Mật khẩu mới không được trùng với mật khẩu cũ!', 'error');
+                return;
+            }
+
+            // Change password
+            const result = await authService.changePassword(oldPassword, newPassword);
+
+            if (result.success) {
+                showPasswordMessage(result.message, 'success');
+                document.getElementById('changePasswordForm').reset();
+
+                // Logout after 2 seconds
+                setTimeout(async () => {
+                    showPasswordMessage('Đang đăng xuất để áp dụng mật khẩu mới...', 'success');
+                    setTimeout(async () => {
+                        await authService.logout();
+                        window.location.href = 'login.html';
+                    }, 1000);
+                }, 2000);
+            } else {
+                showPasswordMessage(result.message, 'error');
+            }
+        }
+
+        // Show password message
+        function showPasswordMessage(message, type) {
+            const messageEl = document.getElementById('passwordMessage');
+            messageEl.textContent = message;
+            messageEl.className = `auth-message ${type}`;
+            messageEl.classList.remove('hidden');
+
+            if (type === 'error') {
+                setTimeout(() => {
+                    messageEl.classList.add('hidden');
+                }, 5000);
+            }
+        }
+
+        // Format date
+        function formatDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,26 @@
+{
+  "name": "ai-todo-app",
+  "version": "2.0.0",
+  "description": "AI Smart To-Do List with Firebase Backend",
+  "main": "index.html",
+  "scripts": {
+    "dev": "firebase emulators:start",
+    "deploy": "firebase deploy",
+    "deploy:hosting": "firebase deploy --only hosting",
+    "deploy:firestore": "firebase deploy --only firestore"
+  },
+  "dependencies": {
+    "firebase": "^10.7.1"
+  },
+  "devDependencies": {
+    "firebase-tools": "^13.0.0"
+  },
+  "keywords": [
+    "todo",
+    "ai",
+    "firebase",
+    "productivity"
+  ],
+  "author": "",
+  "license": "MIT"
+}
