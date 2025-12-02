@@ -140,16 +140,24 @@
 
         // Wait for auth to be ready
         (async () => {
+            console.log('[INDEX] Waiting for auth...');
             await authService.waitForAuth();
+            console.log('[INDEX] Auth ready! Is logged in:', authService.isLoggedIn());
 
             // Check authentication
             if (!authService.isLoggedIn()) {
+                console.log('[INDEX] Not logged in, redirecting in 1s...');
                 if (!hasRedirected) {
                     hasRedirected = true;
-                    setTimeout(() => window.location.href = 'login.html', 100);
+                    setTimeout(() => {
+                        console.log('[INDEX] Redirecting now');
+                        window.location.href = 'login.html';
+                    }, 1000);
                 }
                 return;
             }
+
+            console.log('[INDEX] Logged in as:', authService.getCurrentUser()?.fullName);
 
             // Display user info
             const currentUser = authService.getCurrentUser();
