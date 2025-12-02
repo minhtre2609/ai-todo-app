@@ -158,19 +158,19 @@
             }
         };
 
-        // Check if already logged in
-        (async () => {
-            await authService.waitForAuth();
-
-            if (authService.isLoggedIn()) {
-                const user = authService.getCurrentUser();
-                if (user && user.role === 'admin') {
-                    window.location.href = 'admin.html';
-                } else {
-                    window.location.href = 'index.html';
-                }
-            }
-        })();
+        // Check if already logged in - DISABLED to prevent redirect loop
+        // (async () => {
+        //     await authService.waitForAuth();
+        //
+        //     if (authService.isLoggedIn()) {
+        //         const user = authService.getCurrentUser();
+        //         if (user && user.role === 'admin') {
+        //             window.location.href = 'admin.html';
+        //         } else {
+        //             window.location.href = 'index.html';
+        //         }
+        //     }
+        // })();
 
         // Form elements
         const loginForm = document.getElementById('loginForm');
