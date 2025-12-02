@@ -135,13 +135,19 @@
     <script type="module">
         import authService from './firebase-auth.js';
 
+        // Prevent redirect loop
+        let hasRedirected = false;
+
         // Wait for auth to be ready
         (async () => {
             await authService.waitForAuth();
 
             // Check authentication
             if (!authService.isLoggedIn()) {
-                window.location.href = 'login.html';
+                if (!hasRedirected) {
+                    hasRedirected = true;
+                    setTimeout(() => window.location.href = 'login.html', 100);
+                }
                 return;
             }
 
@@ -159,6 +165,7 @@
             // Logout functionality
             document.getElementById('logoutBtn').addEventListener('click', async () => {
                 await authService.logout();
+                hasRedirected = true;
                 window.location.href = 'login.html';
             });
         })();
