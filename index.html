@@ -141,6 +141,16 @@
         // Wait for auth to be ready
         (async () => {
             console.log('[INDEX] Waiting for auth...');
+
+            // Check if user just logged in
+            const justLoggedIn = sessionStorage.getItem('just_logged_in');
+            if (justLoggedIn) {
+                console.log('[INDEX] User just logged in, clearing flag and waiting longer...');
+                sessionStorage.removeItem('just_logged_in');
+                // Wait extra time for Firebase auth to fully initialize
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+
             await authService.waitForAuth();
             console.log('[INDEX] Auth ready! Is logged in:', authService.isLoggedIn());
 
